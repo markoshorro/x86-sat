@@ -1,11 +1,13 @@
 import z3
 
+
 def is_z3(v):
     return z3.is_expr(v) or z3.is_sort(v)
 
+
 class Value:
     def __init__(self, value, signed=None, width=None):
-        if isinstance(value, Value):
+        if isinstance(value, Value) or "Value" in str(value.__class__):
             if signed is None:
                 signed = value.signed
             if width is None:
@@ -24,12 +26,14 @@ class Value:
     def __eq__(self, other):
         return self.value == other
 
+
 def try_simplify(v):
     if isinstance(v, Value):
         return Value(try_simplify(v.value), signed=v.signed, width=v.width)
     if is_z3(v):
         return z3.simplify(v)
     return v
+
 
 # Extend a value to a given number of bits, either sign- or zero-extended based
 # on the signedness of the value
@@ -50,6 +54,7 @@ def extend(value, width, signed=None):
         else:
             return z3.ZeroExt(diff, value)
     return value
+
 
 def match_types(lhs, rhs):
     # Get width/signedness of each arg
